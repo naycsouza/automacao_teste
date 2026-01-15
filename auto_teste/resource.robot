@@ -1,44 +1,41 @@
-***Settings***
-Documentation       Arquivo Base do teste
-Library             Browser
+*** Settings ***
+Library    Browser
 
-***Keywords***
+*** Variables ***
+${BROWSER}        chromium
+${HEADLESS}       false
+${LOGIN_URL}      https://accounts.google.com/ServiceLogin
+${RECOVERY_TEXT}  Esqueceu seu e-mail?
+${SIGNUP_TEXT}    Criar conta
 
-#Cenário 1
-Dado que entro na página de login
-    New Browser       chromium    headless=false
-    New Page          https://accounts.google.com/signin/v2/identifier?hl=pt-BR&passive=true&continue=https%3A%2F%2Fwww.google.com.br%2F%3Fgws_rd%3Dssl&ec=GAZAmgQ&flowName=GlifWebSignIn&flowEntry=ServiceLogin
-Quando escrevo email inválido
-    Wait For Elements State     id=identifierId         visible      15
-    Fill Text       id=identifierId         teste$teste.com
-    Click           text=Próxima
+*** Keywords ***
+Abrir Navegador E Acessar Login
+    New Browser    ${BROWSER}    headless=${HEADLESS}
+    New Page       ${LOGIN_URL}
 
-Então deve aparecer uma mensagem de advertência
-    Wait For Elements State     css=span[class='jibhHc']        visible   15
+Fechar Navegador
+    Close Browser
+
+Preencher Email
+    [Arguments]    ${email}
+    Wait For Elements State    id=identifierId    visible    15
+    Fill Text    id=identifierId    ${email}
+    Click       text=Próxima
+
+Validar Mensagem De Erro De Email
+    Wait For Elements State    css=span.jibhHc    visible    15
     Take Screenshot
 
+Clicar Em Esqueci Email
+    Click    text=${RECOVERY_TEXT}
 
-#Cenário 2
-Dado que acesso a página de login
-    New Browser       chromium    headless=false
-    New Page          https://accounts.google.com/ServiceLogin/identifier?continue=https%3A%2F%2Fwww.google.com.br%2F%3Fgws_rd%3Dssl&sacu=1&passive=1209600&hl=pt-BR&acui=0&flowName=GlifWebSignIn&flowEntry=ServiceLogin&cid=1
-
-Quando clico em "Esqueci email"
-    Click           text=Esqueceu seu e-mail?
-
-Então sou direcionado à página de recuperação
-    New Page          https://accounts.google.com/signin/v2/usernamerecovery?hl=pt-BR&passive=true&continue=https%3A%2F%2Fwww.google.com.br%2F%3Fgws_rd%3Dssl&ec=GAZAmgQ&flowName=GlifWebSignIn&flowEntry=ServiceLogin
+Validar Página De Recuperação
+    Wait For Elements State    text=Encontre sua conta do Google    visible    15
     Take Screenshot
 
+Clicar Em Criar Conta
+    Click    text=${SIGNUP_TEXT}
 
-#Cenário 3
-Dado que vou para a página de login
-    New Browser       chromium    headless=false
-    New Page          https://accounts.google.com/ServiceLogin/identifier?continue=https%3A%2F%2Fwww.google.com.br%2F%3Fgws_rd%3Dssl&sacu=1&passive=1209600&hl=pt-BR&acui=0&flowName=GlifWebSignIn&flowEntry=ServiceLogin&cid=1
-
-Quando clico em "Criar Conta"
-    Click           text=Criar conta
-
-Então sou direcionado à página de criação da conta
-    New Page        https://accounts.google.com/signup/v2/webcreateaccount?continue=https%3A%2F%2Fwww.google.com.br%2F%3Fgws_rd%3Dssl&hl=pt-BR&dsh=S17403552%3A1658457156057540&biz=false&flowName=GlifWebSignIn&flowEntry=SignUp
+Validar Página De Criação De Conta
+    Wait For Elements State    text=Criar sua Conta Google    visible    15
     Take Screenshot
